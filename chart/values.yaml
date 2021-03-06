@@ -1,0 +1,126 @@
+# Default values for chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+replicaCount: 1
+image:
+  repository: gitlab.example.com/group/project
+  tag: stable
+  pullPolicy: IfNotPresent
+  secrets:
+    - name: gitlab-registry
+podAnnotations: {}
+application:
+  track: stable
+  tier: web
+  migrateCommand:
+  initializeCommand:
+  secretName:
+  secretChecksum:
+  database_url:
+  environments:
+    - name: APP_NAME
+      value: "Bonch.dev CI/CD Laravel App"
+hpa:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+gitlab:
+  app:
+  env:
+  envName:
+  envURL:
+service:
+  enabled: true
+  annotations: {}
+  name: web
+  type: ClusterIP
+  url: http://my.host.com/
+  additionalHosts:
+  commonName:
+  externalPort: 5000
+  internalPort: 5000
+ingress:
+  tls:
+    enabled: true
+    secretName: ""
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      if ($request_method = 'OPTIONS') {
+        more_set_headers 'Access-Control-Allow-Methods: GET, PUT, POST, DELETE,PATCH, OPTIONS';
+        more_set_headers 'Access-Control-Allow-Origin: $http_origin';
+        more_set_headers 'Access-Control-Allow-Headers: DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization,X-CurrentTimezone,X-CurrentCountry,X-Client-Identifier';
+        more_set_headers 'Access-Control-Max-Age: 1728000';
+        more_set_headers 'Access-Control-Allow-Credentials: true';
+        more_set_headers 'Content-Type: text/plain charset=UTF-8';
+        more_set_headers 'Content-Length: 0';
+        more_set_headers 'Access-Control-Expose-Headers: Content-Disposition';
+        return 204;
+      }
+
+      more_set_headers 'Access-Control-Expose-Headers: Content-Disposition';
+      more_set_headers 'Access-Control-Allow-Methods: GET, PUT,POST,DELETE,PATCH, OPTIONS';
+      more_set_headers 'Access-Control-Allow-Origin: $http_origin';
+      more_set_headers 'Access-Control-Allow-Headers:DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization,X-CurrentTimezone,X-CurrentCountry,X-Client-Identifier';
+      more_set_headers 'Access-Control-Allow-Credentials: true';
+    nginx.ingress.kubernetes.io/enable-cors: 'false'
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+  modSecurity:
+    enabled: false
+    secRuleEngine: "DetectionOnly"
+livenessProbe:
+  path: "/"
+  initialDelaySeconds: 15
+  timeoutSeconds: 15
+  scheme: "HTTP"
+readinessProbe:
+  path: "/"
+  initialDelaySeconds: 15
+  timeoutSeconds: 35
+  scheme: "HTTP"
+postgresql:
+  enabled: true
+  managed: false
+redis:
+  enabled: false
+  nameOverride: "redis"
+  cluster:
+    enabled: false
+    slaveCount: 0
+prometheus:
+  metrics: false
+resources:
+#  limits:
+#    cpu: 100m
+#    memory: 128Mi
+  requests:
+#    cpu: 100m
+#    memory: 128Mi
+pvc:
+  enabled: false
+  size: 15Gi
+
+## Configure PodDisruptionBudget
+## ref: https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
+#
+podDisruptionBudget:
+  enabled: false
+  # minAvailable: 1
+  maxUnavailable: 1
+
+workers:
+  # worker:
+  #   replicaCount: 1
+  #   terminationGracePeriodSeconds: 60
+  #   command:
+  #   - /bin/herokuish
+  #   - procfile
+  #   - start
+  #   - worker
+  #   preStopCommand:
+  #   - /bin/herokuish
+  #   - procfile
+  #   - start
+  #   - stop_worker

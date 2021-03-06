@@ -1,0 +1,23 @@
+production:
+  extends: .auto-deploy
+  before_script:
+    - export HELM_UPGRADE_VALUES_FILE=".gitlab/upgrade-values/auto-deploy-values-prod.yaml"
+  stage: production and cleanup
+  script:
+    - auto-deploy check_kube_domain
+    - auto-deploy download_chart
+    - auto-deploy ensure_namespace
+    - auto-deploy initialize_tiller
+    - auto-deploy create_secret
+    - auto-deploy deploy
+    - auto-deploy persist_environment_url
+  environment:
+    name: production
+    url: https://$CI_PROJECT_NAME.$KUBE_INGRESS_BASE_DOMAIN
+  artifacts:
+    paths: [environment_url.txt]
+  when: manual
+  only:
+    refs:
+      - master
+    kubernetes: active

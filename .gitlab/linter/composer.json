@@ -1,0 +1,9 @@
+{
+    "name": "cicd/laravel",
+    "type": "project",
+    "description": "The Laravel Framework.",
+    "require": {
+        "php": "^7.3|^8.0",
+        "emielmolenaar/phpcs-laravel": "^2.0"
+    }
+}

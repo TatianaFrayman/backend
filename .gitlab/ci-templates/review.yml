@@ -1,0 +1,64 @@
+review:
+  extends: .auto-deploy
+  before_script:
+    - export HELM_UPGRADE_VALUES_FILE=".gitlab/upgrade-values/auto-deploy-values-review.yaml"
+    - export POSTGRES_ENABLED="true"
+  stage: review
+  script:
+    - auto-deploy check_kube_domain
+    - auto-deploy download_chart
+    - auto-deploy ensure_namespace
+    - auto-deploy initialize_tiller
+    - auto-deploy create_secret
+    - auto-deploy deploy
+    - auto-deploy persist_environment_url
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: https://$CI_PROJECT_ID-$CI_ENVIRONMENT_SLUG.$KUBE_INGRESS_BASE_DOMAIN
+    on_stop: stop_review
+  artifacts:
+    paths: [environment_url.txt]
+  only:
+    refs:
+      - branches
+      - tags
+    kubernetes: active
+  when: manual
+  except:
+    refs:
+      - staging
+      - master
+      - /^test-.*$/
+      - /^nocicd-.*$/
+    variables:
+      - $REVIEW_DISABLED
+  allow_failure: true
+  needs:
+    - build
+
+stop_review:
+  extends: .auto-deploy
+  stage: cleanup
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - auto-deploy initialize_tiller
+    - auto-deploy delete
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    action: stop
+  when: manual
+  allow_failure: true
+  only:
+    refs:
+      - branches
+      - tags
+    kubernetes: active
+  except:
+    refs:
+      - staging
+      - master
+      - /^test-.*$/
+      - /^nocicd-.*$/
+    variables:
+      - $REVIEW_DISABLED

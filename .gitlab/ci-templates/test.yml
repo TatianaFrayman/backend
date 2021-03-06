@@ -1,0 +1,33 @@
+test:
+  stage: test
+  image: php:7.4.15-fpm-alpine3.13
+  services:
+    - name: postgres:latest
+      alias: postgres
+    - name: redis:latest
+      alias: redis
+  script:
+    - apk add curl
+    - apk add --no-cache libzip-dev postgresql-dev $PHPIZE_DEPS
+    - pecl install -o -f redis
+    - docker-php-ext-install zip pdo pdo_pgsql
+    - docker-php-ext-enable redis zip pdo pdo_pgsql
+    - export APP_ENV="testing"
+    - export DB_CONNECTION="$DB_CONNECTION"
+    - export DB_PORT="$DB_PORT"
+    - export TELESCOPE_ENABLE="false"
+    - export DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
+    - cp -R . /tmp/app
+    - |
+      curl -sS https://getcomposer.org/installer | php && \
+        chmod +x composer.phar && \
+        mv composer.phar /usr/local/bin/composer
+    - composer install
+    - composer run-script test
+  only:
+    - branches
+    - tags
+  needs: []
+  except:
+    variables:
+      - $TEST_DISABLED

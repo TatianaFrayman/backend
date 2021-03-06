@@ -1,0 +1,7 @@
+postgresql:
+  persistence:
+    enabled: false
+application:
+  environments:
+    - name: APP_NAME
+      value: "bonch-dev-laravel-tpl"

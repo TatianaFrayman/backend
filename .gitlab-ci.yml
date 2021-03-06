@@ -1,0 +1,75 @@
+image: alpine:latest
+
+variables:
+  ####################################
+  ###       !!! Warning !!!        ###
+  ####################################
+  ### IF YOU NEED TO SAVE YOUR APPLICATION DATA'S (storage files) YOU MUST
+  ### 1. CHANGE THIS TO "statefulset"
+  ### 2. CHANGE "pvc.enabled" TO "true" IN /chart/values.yaml
+  ### 3. DEFINE "pvc.size" HOW MUCH YOU NEED (pls, max 20Gi)
+  ROLLOUT_RESOURCE_TYPE: deployment
+  ####################################
+  ### End of Stateful data message ###
+  ####################################
+
+  ### App block
+  APP_SECURE: "true"
+  LOG_CHANNEL: "stderr"
+
+  ### Standard DB configs
+  DB_CONNECTION: "pgsql"
+  POSTGRES_DB: $CI_PROJECT_NAME
+  POSTGRES_USER: $CI_PROJECT_NAME
+  POSTGRES_PASSWORD: $CI_COMMIT_REF_SLUG
+  DB_PORT: 5432
+
+  ### DB init and migrate tools
+  DB_INITIALIZE: "composer run initialize --working-dir=/app/"
+  DB_MIGRATE: "composer run migrate --working-dir=/app/"
+
+  ### Postgres block
+  POSTGRES_ENABLED: "true"
+
+  ### Redis block
+  REDIS_ENABLED: "false"
+  REDIS_PASSWORD: $CI_COMMIT_REF_SLUG
+  REDIS_URL: $CI_ENVIRONMENT_SLUG"-redis-master:6379"
+
+  ### Build args
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+  KUBE_NAMESPACE: $CI_PROJECT_PATH_SLUG
+
+  ### Extra magic variables to helm chart
+  HELM_UPGRADE_EXTRA_ARGS: "
+    --set global.postgresql.postgresqlPostgresPassword=$CI_COMMIT_REF_SLUG
+    --set global.postgresql.postgresqlPassword=$CI_COMMIT_REF_SLUG
+    --set global.postgresql.postgresqlUsername=$CI_PROJECT_NAME
+    --set global.postgresql.postgresqlDatabase=$CI_PROJECT_NAME
+    --set redis.enabled=$REDIS_ENABLED
+    --set global.redis.password=$CI_COMMIT_REF_SLUG
+    --set application.redis.port=6379
+    --set application.redis.host=$CI_ENVIRONMENT_SLUG-redis-master
+    --set application.redis.password=$CI_COMMIT_REF_SLUG
+  "
+  LINT_DISABLED: "true"
+
+stages:
+  - build
+  - test
+  - codequality
+  - review
+  - cleanup
+  - production and cleanup
+
+.auto-deploy:
+  image: "registry.gitlab.com/gitlab-org/cluster-integration/auto-deploy-image:v2.0.1"
+
+include:
+  - local: .gitlab/ci-templates/build.yml
+  - local: .gitlab/ci-templates/test.yml
+  - local: .gitlab/ci-templates/lint.yml
+  - local: .gitlab/ci-templates/production.yml
+  - local: .gitlab/ci-templates/review.yml
+  - local: .gitlab/ci-templates/staging.yml

@@ -1,0 +1,45 @@
+staging:
+  extends: .auto-deploy
+  before_script:
+    - export HELM_UPGRADE_VALUES_FILE=".gitlab/upgrade-values/auto-deploy-values-staging.yaml"
+    - export POSTGRES_ENABLED="true"
+  stage: review
+  script:
+    - auto-deploy check_kube_domain
+    - auto-deploy download_chart
+    - auto-deploy ensure_namespace
+    - auto-deploy initialize_tiller
+    - auto-deploy create_secret
+    - auto-deploy deploy
+  environment:
+    name: staging
+    url: https://$CI_PROJECT_NAME-staging.$KUBE_INGRESS_BASE_DOMAIN
+    on_stop: stop_staging
+  only:
+    refs:
+      - staging
+    kubernetes: active
+  except:
+    variables:
+      - $STAGING_DISABLED
+  allow_failure: true
+  needs:
+    - build
+
+stop_staging:
+  extends: .auto-deploy
+  stage: cleanup
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - auto-deploy initialize_tiller
+    - auto-deploy delete
+  environment:
+    name: staging
+    action: stop
+  when: manual
+  allow_failure: true
+  only:
+    refs:
+      - staging
+    kubernetes: active

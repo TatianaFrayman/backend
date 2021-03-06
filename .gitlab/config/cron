@@ -1,0 +1,2 @@
+MAILTO=""
+* * * * * root su nobody -c "php /app/artisan schedule:run -qn"

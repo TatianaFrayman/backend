@@ -1,0 +1,13 @@
+[
+  {
+    "check_name": "ImportDetection.Imports.RequireImports.Import",
+    "fingerprint": "/Users/friilancer/Workspaces/projects/bonch.dev.school/base-project/app/Models/User.php:5:ImportDetection.Imports.RequireImports.Import",
+    "description": "Found unused symbol 'Illuminate\\Contracts\\Auth\\MustVerifyEmail'.",
+    "location": {
+      "path": "/Users/friilancer/Workspaces/projects/bonch.dev.school/base-project/app/Models/User.php",
+      "lines": {
+        "begin": 5
+      }
+    }
+  }
+]

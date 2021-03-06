@@ -1,0 +1,18 @@
+lint:
+  image: cytopia/phpcs:3-php7.4
+  stage: codequality
+  script:
+    - apk add jq curl
+    - |
+      curl -sS https://getcomposer.org/installer | php && \
+        chmod +x composer.phar && \
+        mv composer.phar /usr/local/bin/composer
+    - mv .gitlab/linter/composer.json composer.json
+    - composer update -q -n && composer install -q -n --no-scripts --no-autoloader
+  artifacts:
+    reports:
+      codequality: gl-code-quality-report.json
+  needs: []
+  except:
+    variables:
+      - $LINT_DISABLED

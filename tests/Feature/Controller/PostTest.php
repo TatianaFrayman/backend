@@ -14,7 +14,7 @@ class PostTest extends TestCase
         $response = $this->getJson(
             route("posts.index",
                 [
-                    "param" => "value"
+                    "param"=>"value"
                 ])
         );
 
@@ -28,7 +28,7 @@ class PostTest extends TestCase
         $response = $this->getJson(
             route("posts.index",
                 [
-                    "error" => "this is error"
+                    "error"=>"this is error"
                 ])
         );
 
@@ -42,7 +42,7 @@ class PostTest extends TestCase
         $response = $this->getJson(
             route("posts.show",
                 [
-                    "post" => 2
+                    "post"=>2
                 ])
         );
 
@@ -68,8 +68,8 @@ class PostTest extends TestCase
         $response = $this->postJson(
             route("posts.store",
                 [
-                    "title" => "hello, buddy",
-                    "text" => "this is my first post"
+                    "title"=>"hello, buddy",
+                    "text"=>"this is my first post"
                 ])
         );
 
@@ -94,7 +94,7 @@ class PostTest extends TestCase
         $response = $this->putJson(
             route("posts.update",
                 [
-                    "post" => 1
+                    "post"=>1
                 ])
         );
 
@@ -119,7 +119,7 @@ class PostTest extends TestCase
         $response = $this->deleteJson(
             route("posts.destroy",
                 [
-                    "post" => 1
+                    "post"=>1
                 ])
         );
 

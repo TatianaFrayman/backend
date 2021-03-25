@@ -18,7 +18,7 @@ class PostController extends Controller
         }
 
         return response()->json([
-            "request" => $request->all()
+            "request"=>$request->all()
         ]);
     }
 
@@ -31,7 +31,7 @@ class PostController extends Controller
     public function show(Request $request, int $post): \Illuminate\Http\JsonResponse
     {
         return response()->json([
-            "message" => "there'll be post with id $post"
+            "message"=>"there'll be post with id $post"
         ]);
     }
 
@@ -43,14 +43,13 @@ class PostController extends Controller
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         if (
-            !$request-> title
-        ||!$request -> text
+            !$request->title||!$request->text
         ){
             abort(400,  "required data missing");
         }
         return response()->json([
-            "message" => "post will be created",
-            "request" => $request->all()
+            "message"=>"post will be created",
+            "request"=>$request->all()
         ], 201);
     }
 
@@ -58,6 +57,8 @@ class PostController extends Controller
      * Update post
      *
      * @param Request $request
+     * @param int $post
+     * @return \Illuminate\Http\JsonResponse
      */
 
     public function update(Request $request, int $post): \Illuminate\Http\JsonResponse
@@ -71,6 +72,8 @@ class PostController extends Controller
      * Delete post
      *
      * @param Request $request
+     * @param int $post
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, int $post): \Illuminate\Http\JsonResponse
     {

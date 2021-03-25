@@ -13,8 +13,9 @@ class PostTest extends TestCase
     {
         $response = $this->getJson(
             route("posts.index",
-                ["param"=>"value"
-            ])
+                [
+                    "param" => "value"
+                ])
         );
 
         $response
@@ -26,7 +27,8 @@ class PostTest extends TestCase
     {
         $response = $this->getJson(
             route("posts.index",
-                ["error" => "this is error"
+                [
+                    "error" => "this is error"
                 ])
         );
 
@@ -39,7 +41,8 @@ class PostTest extends TestCase
     {
         $response = $this->getJson(
             route("posts.show",
-                ["post"=> 2
+                [
+                    "post" => 2
                 ])
         );
 
@@ -50,12 +53,12 @@ class PostTest extends TestCase
 
     public function test_show_failure()
     {
-        try{
+        try {
             $response = $this->getJson(
                 route("posts.show")
             );
-        } catch (UrlGenerationException $exception){
-            $this -> assertIsString($exception->getMessage());
+        } catch (UrlGenerationException $exception) {
+            $this->assertIsString($exception->getMessage());
         }
 
     }
@@ -63,11 +66,11 @@ class PostTest extends TestCase
     public function test_store_success()
     {
         $response = $this->postJson(
-            route("posts.store"),
-            [
-                "title" => "hello, buddy",
-                "text" => "this is my first post"
-            ]
+            route("posts.store",
+                [
+                    "title" => "hello, buddy",
+                    "text" => "this is my first post"
+                ])
         );
 
         $response
@@ -90,20 +93,33 @@ class PostTest extends TestCase
     {
         $response = $this->putJson(
             route("posts.update",
-                ["post"=> 1
+                [
+                    "post" => 1
                 ])
         );
 
         $response
             ->dump()
             ->assertStatus(200);
+    }
+
+    public function test_update_failure()
+    {
+        try {
+            $response = $this->putJson(
+                route("posts.update")
+            );
+        } catch (UrlGenerationException $exception) {
+            $this->assertIsString($exception->getMessage());
+        }
     }
 
     public function test_destroy_success()
     {
         $response = $this->deleteJson(
             route("posts.destroy",
-                ["post"=> 1
+                [
+                    "post" => 1
                 ])
         );
 
@@ -111,5 +127,15 @@ class PostTest extends TestCase
             ->dump()
             ->assertStatus(200);
     }
-}
 
+    public function test_destroy_failure()
+    {
+        try {
+            $response = $this->deleteJson(
+                route("posts.destroy")
+            );
+        } catch (UrlGenerationException $exception) {
+            $this->assertIsString($exception->getMessage());
+        }
+    }
+}
